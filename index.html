@@ -6,9 +6,37 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Elektritarbimise visualiseerimine</h1>
-  <input type="file" id="fileInput" accept=".csv">
-  <div id="chart"></div>
+  <header>
+    <nav>
+      <button onclick="showSection('part1')">Ülesanne 1</button>
+      <button onclick="showSection('part2')">Ülesanne 2</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="part1" class="visible">
+      <h1>Ülesanne 1: Ühe andmestiku visualiseerimine</h1>
+      <h3>Vali üks andmestik:</h3>
+      <select id="singleDatasetSelect" style="width: 100%; max-width: 600px;"></select>
+      <button onclick="loadSingleDataset()">Lae andmestik</button>
+      <div id="chart1"></div>
+
+    </section>
+
+    <section id="part2" class="hidden">
+      <h1>Ülesanne 2: Paljude andmestike ühe päeva võrdlus</h1>
+      <h3>Vali andmestikud:</h3>
+      <select id="datasetSelect" multiple size="10" style="width: 100%; max-width: 600px;"></select>
+      <button onclick="loadSelectedDatasets()">Lae valitud andmestikud</button>
+      
+      <label for="dateInput">Kuupäev (YYYY-MM-DD):</label>
+      <input type="date" id="dateInput" value="2023-01-01">
+
+
+      <div id="chart2"></div>
+    </section>
+  </main>
+
   <script src="script.js"></script>
 </body>
 </html>

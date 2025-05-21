@@ -1,9 +1,39 @@
 body {
   font-family: sans-serif;
-  padding: 20px;
-  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
 }
 
-#chart {
+header {
+  background: #333;
+  padding: 10px;
+  text-align: center;
+}
+
+nav button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  background: white;
+  border: none;
+  cursor: pointer;
+}
+
+nav button:hover {
+  background: #ddd;
+}
+
+main {
+  padding: 20px;
+}
+
+section.hidden {
+  display: none;
+}
+
+section.visible {
+  display: block;
+}
+
+#chart1, #chart2 {
   margin-top: 20px;
 }
