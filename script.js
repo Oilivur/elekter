@@ -35,6 +35,8 @@ function drawChart(data, chartId) {
 
 function drawOverlayChart(datasets, chartId) {
   const container = document.getElementById(chartId);
+  container.innerHTML = '';
+
   const canvas = document.createElement('canvas');
   container.appendChild(canvas);
   const ctx = canvas.getContext('2d');
@@ -61,50 +63,49 @@ function drawOverlayChart(datasets, chartId) {
   });
 }
 
-
-const datasetApiUrl = 'https://decision.cs.taltech.ee/electricity/api/';
-
 async function fetchDatasetList() {
   try {
-    const res = await fetch(datasetApiUrl);
+    const res = await fetch('./datasets.json');
     const datasets = await res.json();
-    
+
     const select = document.getElementById('datasetSelect');
-
-    datasets.forEach((entry, i) => {
-      const option = document.createElement('option');
-      option.value = entry.dataset;
-      option.text = `${i + 1}. ${entry.dataset} | ${entry.heat_source} | ${entry.heated_area} m²`;
-      select.appendChild(option);
-    });
-
     const singleSelect = document.getElementById('singleDatasetSelect');
 
-    if (singleSelect) {
-      datasets.forEach((entry, i) => {
-        const option = document.createElement('option');
-        option.value = entry.dataset;
-        option.text = `${i + 1}. ${entry.dataset} | ${entry.heat_source} | ${entry.heated_area} m²`;
-        singleSelect.appendChild(option);
-      });
-    }
+    datasets.forEach((entry, i) => {
+      const option1 = document.createElement('option');
+      option1.value = entry.dataset;
+      option1.text = `${i + 1}. ${entry.dataset} | ${entry.heat_source} | ${entry.heated_area} m²`;
+      select.appendChild(option1);
+
+      const option2 = document.createElement('option');
+      option2.value = entry.dataset;
+      option2.text = option1.text;
+      singleSelect.appendChild(option2);
+    });
   } catch (err) {
-    console.error('Viga andmestike laadimisel:', err);
+    console.error('Viga datasets.json laadimisel:', err);
   }
 }
 
-
-
 async function loadSingleDataset() {
   const hash = document.getElementById('singleDatasetSelect').value;
+  console.log("Loading dataset:", hash);
+
   const chart1 = document.getElementById('chart1');
   chart1.innerHTML = '';
 
-  const url = `https://decision.cs.taltech.ee/electricity/data/${hash}.csv`;
+  const url = `./datasets/${hash}.csv`;
   try {
     const res = await fetch(url);
     const text = await res.text();
+
     const lines = text.split('\n').slice(5);
+    if (lines.length < 24) {
+      console.warn("⚠️ Not enough data rows:", lines.length);
+      chart1.innerHTML = "<p>⚠️ Andmestikus pole piisavalt andmeid visualiseerimiseks.</p>";
+      return;
+    }
+
     const data = lines
       .filter(line => line.trim().length > 0)
       .map(line => {
@@ -117,21 +118,22 @@ async function loadSingleDataset() {
 
     drawChart(data, 'chart1');
   } catch (err) {
-    console.error('Viga andmestiku laadimisel:', err);
+    console.error('❌ Viga andmestiku laadimisel:', err);
+    chart1.innerHTML = "<p>❌ Andmestiku laadimine ebaõnnestus.</p>";
   }
 }
 
 
 async function loadSelectedDatasets() {
   const selected = Array.from(document.getElementById('datasetSelect').selectedOptions).map(opt => opt.value);
-  const targetDate = document.getElementById('dateInput').value; // e.g. "2023-01-01"
+  const targetDate = document.getElementById('dateInput').value;
   const chart2 = document.getElementById('chart2');
   chart2.innerHTML = '';
 
   const datasets = [];
 
   for (const hash of selected) {
-    const url = `https://decision.cs.taltech.ee/electricity/data/${hash}.csv`;
+    const url = `./datasets/${hash}.csv`;
     try {
       const res = await fetch(url);
       const text = await res.text();
@@ -160,6 +162,4 @@ function formatEstonianDate(isoDate) {
   return `${dd}.${mm}.${yyyy}`;
 }
 
-
-// Fetch dataset list on load
 window.addEventListener('DOMContentLoaded', fetchDatasetList);
