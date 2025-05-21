@@ -74,8 +74,8 @@ function drawOverlayChart(datasets, containerId, dateLabel) {
   });
 
   const plot = Plot.plot({
-    width: 800,
-    height: 400,
+    width: 1200,
+    height: 600,
     x: {
       label: "Tund",
       ticks: 24
@@ -90,8 +90,8 @@ function drawOverlayChart(datasets, containerId, dateLabel) {
       Plot.boxY(hourlyPoints, {
         x: "hour",
         y: "value",
-        fill: "steelblue",
-        stroke: "black",
+        fill: "purple",
+        stroke: "darkgreen",
         opacity: 0.7
       })
     ]
