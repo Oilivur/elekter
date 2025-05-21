@@ -27,7 +27,7 @@ function drawContours(matrix, containerId, dayLabels) {
   
   const chart = Plot.plot({
     width: 900,
-    height: 900,
+    height: 700,
     marginLeft: 80,
     x: {
       label: "Tund",
