@@ -1,3 +1,7 @@
+let allValidDays = [];
+let currentMatrix = [];
+let currentDayLabels = [];
+
 function showSection(id) {
   document.querySelectorAll('section').forEach(section => {
     section.classList.add('hidden');
@@ -7,7 +11,7 @@ function showSection(id) {
   document.getElementById(id).classList.add('visible');
 }
 
-function drawContours(matrix, containerId) {
+function drawContours(matrix, containerId, dayLabels) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
 
@@ -16,57 +20,89 @@ function drawContours(matrix, containerId) {
 
   // Flatten into 1D array, row-major (top-to-bottom)
   const values = matrix.flat();
+  const sorted = values.slice().sort((a, b) => a - b);
+  const low = sorted[Math.floor(values.length * 0.01)];
+  const high = sorted[Math.floor(values.length * 0.99)];
 
-  // Create the Plot chart
+  
   const chart = Plot.plot({
-    width: 600,
-    height: 600,
+    width: 900,
+    height: 900,
+    marginLeft: 80,
+    x: {
+      label: "Tund",
+      tickFormat: d => d,
+      ticks: d3.range(0, 24, 1)
+    },
+    y: {
+      label: null,
+      ticks: [0, 99],
+      tickFormat: d => d === 0 ? dayLabels[0] : (d === 99 ? dayLabels[1] : "")
+    },
     color: {
+      scheme: "turbo",
+      domain: [low, high],
+      clamp: true,
       legend: true,
-      label: "Tarbimine (kWh)",
-      scheme: "turbo"
+      label: "Tarbimine (kWh)"
     },
     marks: [
       Plot.contour(values, {
-        width,
-        height,
+        width: 24,
+        height: matrix.length,
         fill: Plot.identity,
         stroke: "black"
       })
     ]
   });
 
+
   container.appendChild(chart);
 }
 
 
-function drawOverlayChart(datasets, chartId) {
-  const container = document.getElementById(chartId);
+function drawOverlayChart(datasets, containerId, dateLabel) {
+  const container = document.getElementById(containerId);
   container.innerHTML = '';
 
-  const canvas = document.createElement('canvas');
-  container.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
-
-  canvas.width = 1000;
-  canvas.height = 400;
-
-  const maxVal = Math.max(...datasets.flat());
-  const stepX = canvas.width / 24;
-  const colors = ['red', 'blue', 'green', 'purple', 'orange', 'teal', 'magenta'];
-
-  datasets.forEach((data, idx) => {
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height - (data[0] / maxVal) * canvas.height);
-    for (let i = 1; i < 24; i++) {
-      const x = i * stepX;
-      const y = canvas.height - (data[i] / maxVal) * canvas.height;
-      ctx.lineTo(x, y);
-    }
-    ctx.strokeStyle = colors[idx % colors.length];
-    ctx.stroke();
+  // Flatten into hour-based points
+  const hourlyPoints = [];
+  datasets.forEach(data => {
+    data.forEach((value, hour) => {
+      hourlyPoints.push({ hour, value });
+    });
   });
+
+  const plot = Plot.plot({
+    width: 800,
+    height: 400,
+    x: {
+      label: "Tund",
+      ticks: 24
+    },
+    y: {
+      label: "Tarbimine (kWh)"
+    },
+    color: {
+      legend: false
+    },
+    marks: [
+      Plot.boxY(hourlyPoints, {
+        x: "hour",
+        y: "value",
+        fill: "steelblue",
+        stroke: "black",
+        opacity: 0.7
+      })
+    ]
+  });
+
+  container.appendChild(plot);
+  document.getElementById("dayTitle").textContent = `Kuupäev: ${dateLabel}`;
 }
+
+
+
 
 async function fetchDatasetList() {
   try {
@@ -79,20 +115,25 @@ async function fetchDatasetList() {
     datasets.forEach((entry, i) => {
       const label = `${i + 1}. ${entry.dataset} | ${entry.heat_source} | ${entry.heated_area} m²`;
 
-      const opt1 = document.createElement('option');
-      opt1.value = entry.dataset;
-      opt1.text = label;
-      select.appendChild(opt1);
+      if (select) {
+        const opt1 = document.createElement('option');
+        opt1.value = entry.dataset;
+        opt1.text = label;
+        select.appendChild(opt1);
+      }
 
-      const opt2 = document.createElement('option');
-      opt2.value = entry.dataset;
-      opt2.text = label;
-      singleSelect.appendChild(opt2);
+      if (singleSelect) {
+        const opt2 = document.createElement('option');
+        opt2.value = entry.dataset;
+        opt2.text = label;
+        singleSelect.appendChild(opt2);
+      }
     });
   } catch (err) {
     console.error('❌ Viga datasets.json laadimisel:', err);
   }
 }
+
 
 async function loadSingleDataset() {
   const hash = document.getElementById('singleDatasetSelect').value;
@@ -128,6 +169,12 @@ async function loadSingleDataset() {
     const validDays = Object.entries(days).filter(([_, values]) => values.length === 24);
     console.log("📊 Valid 24-hour days:", validDays.length);
 
+    allValidDays = validDays; // ✅ Store globally
+    document.getElementById('daySlider').max = validDays.length - 100;
+    document.getElementById('daySlider').value = Math.floor((validDays.length - 100) / 2);
+    updateChartFromSlider(); // 🔁 Initial render
+
+
     if (validDays.length < 100) {
       chart1.innerHTML = `<p>⚠️ Leiti ainult ${validDays.length} sobivat päeva. Vaja vähemalt 100 päeva visualiseerimiseks.</p>`;
       return;
@@ -136,8 +183,13 @@ async function loadSingleDataset() {
     const startIdx = Math.floor((validDays.length - 100) / 2);
     const selectedDays = validDays.slice(startIdx, startIdx + 100);
     const matrix = selectedDays.map(([_, values]) => values);
+    const dayLabels = [
+      selectedDays[0][0],                      // Start date (YYYY-MM-DD)
+      selectedDays[selectedDays.length - 1][0] // End date
+    ];
 
-    drawContours(matrix, 'chart1');
+    drawContours(matrix, 'chart1', dayLabels);
+
 
   } catch (err) {
     console.error('❌ Viga andmestiku laadimisel:', err);
@@ -145,42 +197,65 @@ async function loadSingleDataset() {
   }
 }
 
-async function loadSelectedDatasets() {
-  const selected = Array.from(document.getElementById('datasetSelect').selectedOptions).map(opt => opt.value);
+function updateChartFromSlider() {
+  const startIdx = parseInt(document.getElementById('daySlider').value);
+  const selectedDays = allValidDays.slice(startIdx, startIdx + 100);
+
+  if (selectedDays.length < 100) return;
+
+  currentMatrix = selectedDays.map(([_, values]) => values);
+  currentDayLabels = [
+    selectedDays[0][0],
+    selectedDays[selectedDays.length - 1][0]
+  ];
+
+  document.getElementById('sliderLabel').textContent = `${currentDayLabels[0]} → ${currentDayLabels[1]}`;
+
+  drawContours(currentMatrix, 'chart1', currentDayLabels);
+}
+
+
+async function loadAllDatasetLines() {
   const targetDate = document.getElementById('dateInput').value;
   const chart2 = document.getElementById('chart2');
   chart2.innerHTML = '';
 
-  const datasets = [];
+  const res = await fetch('./datasets.json');
+  const datasets = await res.json();
 
-  for (const hash of selected) {
-    const url = `./datasets/${hash}.csv`;
+  const lines = [];
+
+  for (const entry of datasets) {
+    const url = `./datasets/${entry.dataset}.csv`;
     try {
       const res = await fetch(url);
       const text = await res.text();
-      const lines = text.split('\n').slice(5);
+      const rows = text.split('\n').slice(5);
 
-      const oneDayData = lines
+      const values = rows
         .filter(line => line.startsWith(formatEstonianDate(targetDate)))
         .map(line => {
           const [time, value] = line.split(';');
           return parseFloat(value.replace(',', '.'));
         });
 
-      if (oneDayData.length === 24) {
-        datasets.push(oneDayData);
+      if (values.length === 24) {
+        lines.push(values);
       }
     } catch (err) {
-      console.error(`❌ Viga faili laadimisel: ${hash}`, err);
+      console.warn(`❌ Viga faili laadimisel: ${entry.dataset}`, err);
     }
   }
 
-  if (datasets.length === 0) {
-    chart2.innerHTML = "<p>⚠️ Ühtegi sobivat andmestikku ei leitud valitud kuupäeval.</p>";
-  } else {
-    drawOverlayChart(datasets, 'chart2');
+  if (lines.length === 0) {
+    chart2.innerHTML = "<p>⚠️ Valitud kuupäeval pole ühtegi täielikku andmestikku.</p>";
+    return;
   }
+
+  drawOverlayChart(lines, 'chart2', targetDate);
+
 }
+
 
 function formatEstonianDate(isoDate) {
   const [yyyy, mm, dd] = isoDate.split('-');
@@ -188,3 +263,4 @@ function formatEstonianDate(isoDate) {
 }
 
 window.addEventListener('DOMContentLoaded', fetchDatasetList);
+document.getElementById('daySlider').addEventListener('input', updateChartFromSlider);

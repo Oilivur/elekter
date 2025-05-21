@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.9/dist/plot.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/dist/plot.umd.min.js"></script>
 </head>
 <body>
   <header>
@@ -17,23 +18,26 @@
 
   <main>
     <section id="part1" class="visible">
-      <h1>Ülesanne 1: Ühe andmestiku visualiseerimine</h1>
-      <h3>Vali üks andmestik:</h3>
+      <h1>Ühe andmestiku keskmise 100 päeva visualiseerimine</h1>
+      <h3>Vali andmestik:</h3>
       <select id="singleDatasetSelect" style="width: 100%; max-width: 600px;"></select>
-      <button onclick="loadSingleDataset()">Lae andmestik</button>
+      <button onclick="loadSingleDataset()">Visualiseeri</button>
+      
+      <label for="daySlider">Nihuta päevavahemikku:</label>
+      <input type="range" id="daySlider" min="0" max="0" value="0" step="1">
+      <span id="sliderLabel"></span>
+      
       <div id="chart1"></div>
 
     </section>
 
     <section id="part2" class="hidden">
-      <h1>Ülesanne 2: Paljude andmestike ühe päeva võrdlus</h1>
-      <h3>Vali andmestikud:</h3>
-      <select id="datasetSelect" multiple size="10" style="width: 100%; max-width: 600px;"></select>
-      <button onclick="loadSelectedDatasets()">Lae valitud andmestikud</button>
-      
+      <h1>Paljude andmestike ühe päeva võrdlus</h1>
       <label for="dateInput">Kuupäev (YYYY-MM-DD):</label>
       <input type="date" id="dateInput" value="2023-01-01">
+      <button onclick="loadAllDatasetLines()">Visualiseeri kõigi andmestike sama päev</button>
 
+      <h2 id="dayTitle"></h2>
 
       <div id="chart2"></div>
     </section>
