@@ -7,31 +7,38 @@ function showSection(id) {
   document.getElementById(id).classList.add('visible');
 }
 
-function drawChart(data, chartId) {
-  const container = document.getElementById(chartId);
+function drawContours(matrix, containerId) {
+  const container = document.getElementById(containerId);
   container.innerHTML = '';
 
-  const canvas = document.createElement('canvas');
-  container.appendChild(canvas);
-  const ctx = canvas.getContext('2d');
+  const width = 24;   // hours
+  const height = matrix.length;  // days
 
-  canvas.width = 1000;
-  canvas.height = 400;
+  // Flatten into 1D array, row-major (top-to-bottom)
+  const values = matrix.flat();
 
-  const maxVal = Math.max(...data.map(d => d.value));
-  const minVal = Math.min(...data.map(d => d.value));
-  const stepX = canvas.width / data.length;
-
-  ctx.beginPath();
-  ctx.moveTo(0, canvas.height - (data[0].value - minVal) / (maxVal - minVal) * canvas.height);
-  data.forEach((d, i) => {
-    const x = i * stepX;
-    const y = canvas.height - (d.value - minVal) / (maxVal - minVal) * canvas.height;
-    ctx.lineTo(x, y);
+  // Create the Plot chart
+  const chart = Plot.plot({
+    width: 600,
+    height: 600,
+    color: {
+      legend: true,
+      label: "Tarbimine (kWh)",
+      scheme: "turbo"
+    },
+    marks: [
+      Plot.contour(values, {
+        width,
+        height,
+        fill: Plot.identity,
+        stroke: "black"
+      })
+    ]
   });
-  ctx.strokeStyle = 'blue';
-  ctx.stroke();
+
+  container.appendChild(chart);
 }
+
 
 function drawOverlayChart(datasets, chartId) {
   const container = document.getElementById(chartId);
@@ -45,17 +52,15 @@ function drawOverlayChart(datasets, chartId) {
   canvas.height = 400;
 
   const maxVal = Math.max(...datasets.flat());
-  const minVal = 0;
   const stepX = canvas.width / 24;
-
   const colors = ['red', 'blue', 'green', 'purple', 'orange', 'teal', 'magenta'];
 
   datasets.forEach((data, idx) => {
     ctx.beginPath();
-    ctx.moveTo(0, canvas.height - (data[0] - minVal) / (maxVal - minVal) * canvas.height);
+    ctx.moveTo(0, canvas.height - (data[0] / maxVal) * canvas.height);
     for (let i = 1; i < 24; i++) {
       const x = i * stepX;
-      const y = canvas.height - (data[i] - minVal) / (maxVal - minVal) * canvas.height;
+      const y = canvas.height - (data[i] / maxVal) * canvas.height;
       ctx.lineTo(x, y);
     }
     ctx.strokeStyle = colors[idx % colors.length];
@@ -72,57 +77,73 @@ async function fetchDatasetList() {
     const singleSelect = document.getElementById('singleDatasetSelect');
 
     datasets.forEach((entry, i) => {
-      const option1 = document.createElement('option');
-      option1.value = entry.dataset;
-      option1.text = `${i + 1}. ${entry.dataset} | ${entry.heat_source} | ${entry.heated_area} m²`;
-      select.appendChild(option1);
+      const label = `${i + 1}. ${entry.dataset} | ${entry.heat_source} | ${entry.heated_area} m²`;
 
-      const option2 = document.createElement('option');
-      option2.value = entry.dataset;
-      option2.text = option1.text;
-      singleSelect.appendChild(option2);
+      const opt1 = document.createElement('option');
+      opt1.value = entry.dataset;
+      opt1.text = label;
+      select.appendChild(opt1);
+
+      const opt2 = document.createElement('option');
+      opt2.value = entry.dataset;
+      opt2.text = label;
+      singleSelect.appendChild(opt2);
     });
   } catch (err) {
-    console.error('Viga datasets.json laadimisel:', err);
+    console.error('❌ Viga datasets.json laadimisel:', err);
   }
 }
 
 async function loadSingleDataset() {
   const hash = document.getElementById('singleDatasetSelect').value;
-  console.log("Loading dataset:", hash);
-
   const chart1 = document.getElementById('chart1');
   chart1.innerHTML = '';
+  console.log("📂 Loading dataset:", hash);
 
-  const url = `./datasets/${hash}.csv`;
   try {
-    const res = await fetch(url);
+    const res = await fetch(`./datasets/${hash}.csv`);
     const text = await res.text();
-
     const lines = text.split('\n').slice(5);
-    if (lines.length < 24) {
-      console.warn("⚠️ Not enough data rows:", lines.length);
-      chart1.innerHTML = "<p>⚠️ Andmestikus pole piisavalt andmeid visualiseerimiseks.</p>";
-      return;
-    }
 
-    const data = lines
-      .filter(line => line.trim().length > 0)
+    let data = lines
+      .filter(line => line.trim() && line.includes(';'))
       .map(line => {
         const [time, value] = line.split(';');
         return {
           time: new Date(time.split(' ')[0].split('.').reverse().join('-') + 'T' + time.split(' ')[1] + ':00'),
           value: parseFloat(value.replace(',', '.')),
         };
-      });
+      })
+      .filter(d => !isNaN(d.value));
 
-    drawChart(data, 'chart1');
+    data.sort((a, b) => a.time - b.time);
+
+    const days = {};
+    data.forEach(d => {
+      const key = d.time.toISOString().split('T')[0];
+      if (!days[key]) days[key] = [];
+      days[key].push(d.value);
+    });
+
+    const validDays = Object.entries(days).filter(([_, values]) => values.length === 24);
+    console.log("📊 Valid 24-hour days:", validDays.length);
+
+    if (validDays.length < 100) {
+      chart1.innerHTML = `<p>⚠️ Leiti ainult ${validDays.length} sobivat päeva. Vaja vähemalt 100 päeva visualiseerimiseks.</p>`;
+      return;
+    }
+
+    const startIdx = Math.floor((validDays.length - 100) / 2);
+    const selectedDays = validDays.slice(startIdx, startIdx + 100);
+    const matrix = selectedDays.map(([_, values]) => values);
+
+    drawContours(matrix, 'chart1');
+
   } catch (err) {
     console.error('❌ Viga andmestiku laadimisel:', err);
     chart1.innerHTML = "<p>❌ Andmestiku laadimine ebaõnnestus.</p>";
   }
 }
-
 
 async function loadSelectedDatasets() {
   const selected = Array.from(document.getElementById('datasetSelect').selectedOptions).map(opt => opt.value);
@@ -150,11 +171,15 @@ async function loadSelectedDatasets() {
         datasets.push(oneDayData);
       }
     } catch (err) {
-      console.error(`Viga faili laadimisel: ${hash}`, err);
+      console.error(`❌ Viga faili laadimisel: ${hash}`, err);
     }
   }
 
-  drawOverlayChart(datasets, 'chart2');
+  if (datasets.length === 0) {
+    chart2.innerHTML = "<p>⚠️ Ühtegi sobivat andmestikku ei leitud valitud kuupäeval.</p>";
+  } else {
+    drawOverlayChart(datasets, 'chart2');
+  }
 }
 
 function formatEstonianDate(isoDate) {

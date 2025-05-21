@@ -35,27 +35,6 @@
     "heat_source": "Lokaalne küte: maasoojuspump"
   },
   {
-    "dataset": "e19ce9f7cd6985d21742127622",
-    "filesize": 201072,
-    "num_rows": 8783,
-    "heated_area": 61,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
-    "dataset": "eb18877694cc036a1742320408",
-    "filesize": 573167,
-    "num_rows": 26308,
-    "heated_area": 26,
-    "heat_source": "Lokaalne küte: ahi / kamin"
-  },
-  {
-    "dataset": "aa9c3ce25421e6231742320435",
-    "filesize": 573167,
-    "num_rows": 26308,
-    "heated_area": 26,
-    "heat_source": "Lokaalne küte: ahi / kamin"
-  },
-  {
     "dataset": "6f9be12993e8e64a1742388290",
     "filesize": 201093,
     "num_rows": 8788,
@@ -75,13 +54,6 @@
     "num_rows": 26332,
     "heated_area": 45.7,
     "heat_source": "Kaugküte / Keskküte"
-  },
-  {
-    "dataset": "1ae9065ecd2be30d1742886509",
-    "filesize": 198452,
-    "num_rows": 8764,
-    "heated_area": 42.8,
-    "heat_source": "Lokaalne küte: õhk-õhk soojuspump"
   },
   {
     "dataset": "c2a91e3d7222f6d51743069686",
@@ -147,13 +119,6 @@
     "heat_source": "Lokaalne küte: maasoojuspump"
   },
   {
-    "dataset": "3fa9b2e8059610111743845024",
-    "filesize": 680216,
-    "num_rows": 26308,
-    "heated_area": 60,
-    "heat_source": "Lokaalne küte: ahi / kamin"
-  },
-  {
     "dataset": "44e2cb4caa1616d61743847885",
     "filesize": 414023,
     "num_rows": 17572,
@@ -196,13 +161,6 @@
     "heat_source": "Lokaalne küte: õli või gaasikatel"
   },
   {
-    "dataset": "3928363183f16d881744380435",
-    "filesize": 17357,
-    "num_rows": 735,
-    "heated_area": 145,
-    "heat_source": "Lokaalne küte: õhk-vesi soojuspump"
-  },
-  {
     "dataset": "2d62a14b1045db681744471246",
     "filesize": 602030,
     "num_rows": 26308,
@@ -238,25 +196,11 @@
     "heat_source": "Lokaalne küte: õli või gaasikatel"
   },
   {
-    "dataset": "857c629050d5153a1744565717",
-    "filesize": 525336,
-    "num_rows": 17548,
-    "heated_area": 250,
-    "heat_source": "Lokaalne küte: maasoojuspump"
-  },
-  {
     "dataset": "04c798f9f2f6110e1744569025",
     "filesize": 402016,
     "num_rows": 17572,
     "heated_area": 90,
     "heat_source": "Lokaalne küte: õhk-õhk soojuspump"
-  },
-  {
-    "dataset": "f7389b5ebd90d3eb1744620143",
-    "filesize": 663,
-    "num_rows": 29,
-    "heated_area": 20,
-    "heat_source": "Kaugküte / Keskküte"
   },
   {
     "dataset": "630f13ae81a074ed1744621265",
@@ -278,13 +222,6 @@
     "num_rows": 26307,
     "heated_area": 261,
     "heat_source": "Lokaalne küte: puidu või muu tahkekütuse katel"
-  },
-  {
-    "dataset": "8f482675d80a78c31744726588",
-    "filesize": 597148,
-    "num_rows": 26308,
-    "heated_area": 47,
-    "heat_source": "Kaugküte / Keskküte"
   },
   {
     "dataset": "cfb9a6dbf51304eb1744736557",
@@ -329,13 +266,6 @@
     "heat_source": "Lokaalne küte: maasoojuspump"
   },
   {
-    "dataset": "1f05ecb930a1c5651745517021",
-    "filesize": 681353,
-    "num_rows": 26308,
-    "heated_area": 75,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
     "dataset": "af8b7f1d876adedc1745577376",
     "filesize": 201115,
     "num_rows": 8788,
@@ -364,13 +294,6 @@
     "heat_source": "Lokaalne küte: õhk-vesi soojuspump"
   },
   {
-    "dataset": "e021888d36f1bee41745656875",
-    "filesize": 767971,
-    "num_rows": 26332,
-    "heated_area": 3798,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
     "dataset": "7610bb9560d4b4f71745690398",
     "filesize": 602186,
     "num_rows": 26308,
@@ -382,27 +305,6 @@
     "filesize": 602314,
     "num_rows": 26308,
     "heated_area": 90,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
-    "dataset": "b85bbbb8471a87d31745762953",
-    "filesize": 14635,
-    "num_rows": 612,
-    "heated_area": 43.7,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
-    "dataset": "2ec0ffa684e5c4691745781581",
-    "filesize": 626951,
-    "num_rows": 26308,
-    "heated_area": 54,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
-    "dataset": "cb06e5998f1656f21745880224",
-    "filesize": 582028,
-    "num_rows": 26308,
-    "heated_area": 49,
     "heat_source": "Kaugküte / Keskküte"
   },
   {
@@ -497,32 +399,11 @@
     "heat_source": "Lokaalne küte: ahi / kamin"
   },
   {
-    "dataset": "bf40f5d69040dad31747166895",
-    "filesize": 7443,
-    "num_rows": 370,
-    "heated_area": 74,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
-    "dataset": "2c0dd3afa97571ed1747214229",
-    "filesize": 201178,
-    "num_rows": 8789,
-    "heated_area": 145,
-    "heat_source": "Lokaalne küte: õhk-õhk soojuspump"
-  },
-  {
     "dataset": "bc83864b5eb925b71747326085",
     "filesize": 607683,
     "num_rows": 26548,
     "heated_area": 116,
     "heat_source": "Lokaalne küte: maasoojuspump"
-  },
-  {
-    "dataset": "bea801d23fa935f71747331673",
-    "filesize": 195636,
-    "num_rows": 8788,
-    "heated_area": 0,
-    "heat_source": "Lokaalne küte: õli või gaasikatel"
   },
   {
     "dataset": "b212b51878ecffe11747335800",
@@ -546,13 +427,6 @@
     "heat_source": "Lokaalne küte: õli või gaasikatel"
   },
   {
-    "dataset": "6df8487b654fc5921747595281",
-    "filesize": 202223,
-    "num_rows": 8788,
-    "heated_area": 59.1,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
     "dataset": "2846a604efcd9ebd1747598935",
     "filesize": 582390,
     "num_rows": 26308,
@@ -567,31 +441,10 @@
     "heat_source": "Kaugküte / Keskküte"
   },
   {
-    "dataset": "cf148e05aea2e7981747678556",
-    "filesize": 174045,
-    "num_rows": 8764,
-    "heated_area": 60,
-    "heat_source": "Lokaalne küte: elektri otseküte (elektriradiaatorid)"
-  },
-  {
-    "dataset": "46976fb8998d287a1747776943",
-    "filesize": 25692,
-    "num_rows": 1100,
-    "heated_area": 46.6,
-    "heat_source": "Lokaalne küte: õli või gaasikatel"
-  },
-  {
     "dataset": "9eabc8136b678c351747818320",
     "filesize": 201148,
     "num_rows": 8788,
     "heated_area": 66.8,
-    "heat_source": "Kaugküte / Keskküte"
-  },
-  {
-    "dataset": "6df7cad937de1f461747833479",
-    "filesize": 622955,
-    "num_rows": 26332,
-    "heated_area": 81,
     "heat_source": "Kaugküte / Keskküte"
   },
   {
